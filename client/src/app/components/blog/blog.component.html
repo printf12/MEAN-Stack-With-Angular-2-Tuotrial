@@ -1,0 +1,446 @@
+<h1 class="page-header">Track  Order</h1>
+
+<!-- Custom Success/Error Message -->
+<div class="row show-hide-message" *ngIf="message && newPost">
+  <div [ngClass]="messageClass">
+    {{ message }}
+  </div>
+</div>
+
+<!-- New Post Button -->
+<button type="button" name="button" class="btn btn-warning" *ngIf="!newPost" (click)="newBlogForm()">New Order</button>
+
+<!-- Reload Button -->
+<button [disabled]="loadingBlogs" type="button" name="button" class="btn btn-default" *ngIf="!newPost" (click)="reloadBlogs()"><span class="glyphicon glyphicon-repeat"></span>&nbsp;&nbsp;Reload</button>
+
+<br />
+<br />
+
+<!-- New Blog Form -->
+<form [formGroup]="form" name="blogForm" (submit)="onBlogSubmit()" *ngIf="newPost">
+  <!-- Title Input -->
+  <div class="form-group">
+    <div [ngClass]="{'has-success': form.controls.title.valid, 'has-error': form.controls.title.dirty && form.controls.title.errors}">
+      <!-- Title Input -->
+      <input type="text" name="title" class="form-control" placeholder="*Item Name" autocomplete="off" formControlName="title" />
+      <!-- Validation -->
+      <ul class="help-block">
+        <li *ngIf="form.controls.title.dirty && form.controls.title.errors?.required">This field is required.</li>
+        <li *ngIf="(form.controls.title.dirty && form.controls.title.errors?.minlength) || (form.controls.title.dirty && form.controls.title.errors?.maxlength)">Max length: 50, Min length: 5</li>
+        <li *ngIf="form.controls.title.dirty && form.controls.title.errors?.alphaNumericValidation">Must be a letter or number</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Body Input -->
+  <div class="form-group">
+    <div [ngClass]="{'has-success': form.controls.body.valid, 'has-error': form.controls.body.dirty && form.controls.body.errors}">
+      <!-- Body Input -->
+      <input name="body"  placeholder="*Order Number" class="form-control" formControlName="body">
+      <!-- Validation -->
+      <ul class="help-block">
+        <li *ngIf="form.controls.body.dirty && form.controls.body.errors?.required">This field is required.</li>
+        <li *ngIf="(form.controls.body.dirty && form.controls.body.errors?.minlength) || (form.controls.body.dirty && form.controls.body.errors?.maxlength)">Max length: 500, Min length: 5</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="body">Status</label>
+     <select id="monselect" name="cas" class="form-control" formControlName="cas">
+  <option  ng-selected="selected" value="processing">Processing</option> 
+  <option value="ontheway">On the way</option>
+  <option value="delivered">Delivered</option>
+</select>
+  </div>
+
+  <!-- Go Back Button -->
+  <button [disabled]="processing" type="button" name="button" (click)="goBack()" class="btn btn-warning">Go Back</button>
+  <!-- Submit Button -->
+  <button [disabled]="processing || !form.valid" type="submit" name="button" class="btn btn-success">Submit</button>
+
+</form>
+<!-- New Blog Form -->
+
+<!-- Panel Start -->
+<!--uu-->
+<div *ngIf="!newPost">
+<div   *ngFor="let blog of blogPosts">
+  
+  
+      
+         <div class="col-12 col-lg-9">
+            <div class="track-result">
+               <div class="track-result-block">
+                 <div class="track-result-id"><b>Order Tracking Number :</b>   {{ blog.body }}</div>
+                 <div class="track-status">
+                   <div class="row">
+                     <div class="col-12 col-lg-4"><b>Ordred By:</b> {{ blog.createdBy }}</div>
+                     <div class="col-12 col-lg-4"><b>Status:</b> {{ blog.cas }}</div>
+                     <div class="col-12 col-lg-4"><b>Order Placed At: {{ blog.createdAt | date:'MMM dd, yyyy' }} </b></div>
+                   </div>
+                 </div>
+                 <div *ngIf="blog.cas=='delivered'">
+                 <div  class="track-result-bar">
+
+                  <ul class="track-progress">
+                    <li class="icon-confirm-roder track-active">Confirmed Order</li>
+                    <li class="icon-process-roder track-active">Processing Order</li>
+                    <li class="icon-dispatched-item track-active">Dispatched Item</li>
+                    <li class="icon-product-deliver track-active">Product Delivered</li>
+                  </ul>
+                 </div>
+              </div>
+              <div *ngIf="blog.cas=='processing'">
+                 <div  class="track-result-bar">
+
+                  <ul class="track-progress">
+                    <li class="icon-confirm-roder track-active">Confirmed Order</li>
+                    <li class="icon-process-roder track-active">Processing Order</li>
+                    <li class="icon-dispatched-item ">Dispatched Item</li>
+                    <li class="icon-product-deliver ">Product Delivered</li>
+                  </ul>
+                 </div>
+              </div> 
+
+              <div *ngIf="blog.cas=='ontheway'">
+                 <div  class="track-result-bar">
+
+                  <ul class="track-progress">
+                    <li class="icon-confirm-roder track-active">Confirmed Order</li>
+                    <li class="icon-process-roder track-active">Processing Order</li>
+                    <li class="icon-dispatched-item track-active">Dispatched Item</li>
+                    <li class="icon-product-deliver ">Product Delivered</li>
+                  </ul>
+                 </div>
+              </div>  
+              </div>
+
+      <div class="dropdown">
+        <!-- Like Button -->
+        <button [disabled]="blog.likedBy.indexOf(username) > -1" type="button" name="button" class="btn btn-sm btn-success" *ngIf="username !== blog.createdBy" (click)="likeBlog(blog._id)"><span class="glyphicon glyphicon-thumbs-up">&nbsp;</span>Likes: {{ blog.likes }}</button>
+        <!-- Dropdown Menu Items -->
+        <div class="dropdown-content">
+          <a [routerLink]="['/user/', liker]" *ngFor="let liker of blog.likedBy">{{ liker }}</a>
+        </div>
+      </div>
+
+      <!-- Dislikes Dropdown  -->
+      <div class="dropdown">
+        <!-- Dislike Button -->
+        <button [disabled]="blog.dislikedBy.indexOf(username) > -1" type="button" name="button" class="btn btn-sm btn-warning" *ngIf="username !== blog.createdBy" (click)="dislikeBlog(blog._id)"><span class="glyphicon glyphicon-thumbs-down">&nbsp;</span>Dislikes: {{ blog.dislikes }}</button>
+        <!-- Dropdown Menu Items -->
+        <div class="dropdown-content">
+          <a [routerLink]="['/user/', disliker]" *ngFor="let disliker of blog.dislikedBy">{{ disliker }}</a>
+        </div>
+      </div>
+       <!-- Post Comment Box: Start -->
+    <ul class="list-group">
+      <li class="list-group-item" style="     border: 3px solid white; ">
+        <div *ngIf="newComment.indexOf(blog._id) > -1">
+
+          <!-- Form: Comment Form Start -->
+          <form [formGroup]="commentForm">
+            <!-- Textarea Input -->
+            <textarea name="comment" rows="10" cols="30" class="form-control" formControlName="comment"></textarea>
+            <!-- Validation -->
+            <div [ngClass]="{'has-success': !commentForm.controls.comment.errors && commentForm.controls.comment.dirty, 'has-error': commentForm.controls.comment.dirty && commentForm.controls.comment.errors}">
+              <ul class="help-block">
+                <li *ngIf="commentForm.controls.comment.errors?.required && commentForm.controls.comment.dirty">This field is required.</li>
+                <li *ngIf="(commentForm.controls.comment.errors?.maxlength && commentForm.controls.comment.dirty) ||(commentForm.controls.comment.errors?.minlength && commentForm.controls.comment.dirty)">Comment must be at least 1 character but no more than 200.</li>
+              </ul>
+            </div>
+            <!-- Post Button -->
+            <button [disabled]="!commentForm.valid || processing" type="submit" name="button" class="btn btn-sm btn-info" (click)="postComment(blog._id)">Post</button>
+            <!-- Cancel Button -->
+            <button [disabled]="processing" type="button" name="button" class="btn btn-sm btn-danger" (click)="cancelSubmission(blog._id)">Cancel</button>
+          </form>
+          <!-- Form: Comment Form End -->
+
+        </div>
+
+        <!-- Show Comments -->
+        <li *ngIf="enabledComments.indexOf(blog._id) === -1 && blog.comments.length > 0" class="list-group-item">
+          <span (click)="expand(blog._id)">
+            Show comments&nbsp;&nbsp;
+            <div class="glyphicon glyphicon-comment"></div>
+          </span>
+        </li>
+
+        <!-- Hide Comments -->
+        <li *ngIf="enabledComments.indexOf(blog._id) > -1" class="list-group-item">
+          <span (click)="collapse(blog._id)">
+            Hide Comments&nbsp;&nbsp;
+            <div class="glyphicon glyphicon-comment"></div>
+          </span>
+        </li>
+
+        <!-- Comment -->
+        <div *ngIf="enabledComments.indexOf(blog._id) > -1">
+          <li *ngFor="let comment of blog.comments" class="list-group-item">
+            <strong>{{ comment.commentator }}:</strong> {{ comment.comment }}
+          </li>
+        </div>
+        <a [routerLink]="['/edit-blog/', blog._id]" *ngIf="username === blog.createdBy"><button type="button" name="button" class="btn btn-sm btn-info">Edit</button></a>
+      <!-- Delete Button -->
+      <a [routerLink]="['/delete-blog/', blog._id]" *ngIf="username === blog.createdBy"><button type="button" name="button" class="btn btn-sm btn-danger">Delete</button></a>
+      <!-- Post Comment Button -->
+        <button type="button" name="button" class="btn btn-sm btn-danger" (click)="draftComment(blog._id)" [disabled]="newComment.indexOf(blog._id) > -1">Post Comment</button>
+    </ul>
+    <!-- Post Comment Box: End --> 
+            </div>
+
+
+              
+         </div>
+         <!-- Right sidebar start --> 
+         
+         <!-- Right sidebar end --> 
+      
+    
+  
+    
+   
+    
+  
+  <div class="col-md-4 col-lg-4 col-sm-12 col-xs-12">
+   
+    
+  </div>
+</div>
+</div>
+
+<style type="text/css">
+  
+  .order-successful-text {
+  font-family: Oswald;
+  font-size: 2.25em;
+  font-weight: bold;
+  color: #444444;
+  padding: 20px;
+}
+.track-your-order {
+  padding-top: 20px;
+  padding-left: 0px;
+}
+.arriving-in-header{
+  padding-top: 20px;
+  padding-left: 0px;
+}
+.main-div {
+  background-color: #f5f5f5;
+}
+.track-order-div {
+
+}
+.order-status-div {
+    background-color: #ffffff;
+    box-shadow: 0 2px 2px 0 rgba(181, 181, 181, 0.5);
+    padding: 5px;
+}
+.order-placed-image {
+  display: block;
+  margin: auto;
+}
+.order-status-text {
+  text-align:center;
+  margin-top: 10px;
+  font-family: Oswald;
+  font-size: 2.25em;
+  font-weight: bold;
+  text-align: center;
+  color: #4cb209;
+}
+.order-id {
+  text-align: center;
+  font-family: Lato;
+  font-size: 1em;
+  font-weight: bold;
+  text-align: center;
+  color: #4a4a4a;
+}
+.progress-bar {
+  width:60%;
+  height:1px;
+  background-color: #d55e57;
+}
+.order-received{
+  width:50px;
+  height:50px;
+      background: url(https://d30mle0t4iy75h.cloudfront.net/website/track-order-status-1.png);
+}
+.track-process {
+    position: relative;
+}
+.customer-details{
+  box-shadow: 0 2px 2px 0 rgba(181, 181, 181, 0.5);
+  padding-left:20px;
+  font-family: Lato;
+  font-size: 1em;
+  font-weight: 500;
+  background-color: #ffffff;
+  border-top: solid 1px #979797;
+  padding-top: 10px;
+}
+.delivery-text{
+  font-family: Lato;
+  font-size: 17px;
+  font-weight: 500;
+  color: #000000;
+}
+.delivery-address {
+  font-family: Lato;
+  font-size: 1em;
+  color: #4a4a4a;
+}
+.consumer-phonenumber {
+  font-family: Lato;
+  font-size: 1em;
+  color: #000000;
+ padding-bottom: 10px;
+}
+.arriving-in-details{
+  box-shadow: 0 2px 2px 0 rgba(181, 181, 181, 0.5);
+  background-color:#ffffff;
+}
+
+.arriving-in-details li {
+  border-bottom: solid 1px #979797;
+}
+.arriving-in-details ul {
+  list-style-type: none;
+  padding: 0px;
+}
+.delivery-time {
+  font-family: Oswald;
+  font-size: 1.5em;
+  font-weight: 500;
+  color: #000000;
+  text-align:center;
+  padding:5px;
+}
+.delivery-boy-num {
+   font-family: OpenSans;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+  color: #cb352b;
+  padding: 5px;
+}
+.live-tracking-btn {
+  font-family: OpenSans;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #cb352b;
+  text-align:center;
+  padding: 5px;
+}
+.order-information-header{
+  font-family: Lato;
+  font-size: 1em;
+  font-weight: 500;
+  color: #000000;
+  margin-top: 20px;
+}
+.order-information-div {
+  box-shadow: 0 2px 2px 0 rgba(181, 181, 181, 0.5);
+  background-color: #ffffff;
+}
+.orderId{
+  font-family: Lato;
+  font-size: 1em;
+  font-weight: bold;
+  color: #4a4a4a;
+  padding-top:10px;
+  padding-left: 15px;
+}
+.ordered-time{
+   font-family: Lato;
+   font-size: 1em;
+   color: #4a4a4a;
+   padding-top:5px;
+   padding-left:15px;
+  padding-bottom: 5px;
+}
+.item-container-div {
+  box-shadow: 0 2px 2px 0 rgba(181, 181, 181, 0.5);
+  background-color: #ffffff;
+}
+.item-container-div ul {
+  list-style-type: none;
+  padding:0px;
+}
+.item-container-div li {
+  border-bottom:solid 1px #979797;
+}
+.item-container-div p {
+  font-family: Lato;
+  font-size: 1em;
+  color: #000000;
+  padding: 0px;
+  margin:0px;
+}
+.item-container-div quantity {
+  font-family: Lato;
+  font-size: 0.1em;
+  color: #787878;
+}
+.item-list-div{
+  padding-top:5px;
+  padding-left: 15px;
+  padding-bottom: 5px;
+}
+.combo-item {
+  display:block;
+  margin-left: 5px;
+}
+.order-status-animation{
+  list-style-type: none;   
+  padding: 0px;
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+}
+.order-status-animation img {
+  width: 50px;
+}
+.order-status-animation p{
+  font-family: Lato;
+  font-size: 1em;
+  margin-top: 10px;
+  color: #ce453b;
+  word-break: break-word;
+}
+
+.order-status-animation li {
+/*   display: inline-block;
+  padding-left: 10%; */
+   display: table-cell;
+  width: auto;
+  text-align: center;
+}
+.order-status-animation li:first-child {
+  padding-left: 0px;
+}
+
+@media screen and (max-width:640px) {
+  .order-status-animation p{ 
+    font-size: 0.9em;
+  }
+}  
+.order-status-animation li {
+  position: relative;
+}
+
+/* .order-placed:after{
+    position: absolute;
+    left: calc(90% - 60px);
+    top:20px;
+    content: " ";
+    width: 160px;
+    height: 1px;
+    border: solid 1px #cb352b;
+} */
+</style>
+
+

@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "cd client && ng build --prod && cd.. && node index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/printf12/MEAN-Stack-With-Angular-2-Tuotrial.git"
+    "url": "git+https://github.com/printf12/tarkiz.git"
   },
   "keywords": [
     "MEAN",
@@ -21,11 +22,15 @@
   "author": "ouss",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/printf12/MEAN-Stack-With-Angular-2-Tuotrial/issues"
+    "url": "https://github.com/printf12/tarkiz/issues"
   },
-  "homepage": "https://github.com/printf12/MEAN-Stack-With-Angular-2-Tuotrial#readme",
+  "homepage": "https://github.com/printf12/tarkiz#readme",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
     "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.1",
     "mongoose": "^5.0.2"
   }
 }
